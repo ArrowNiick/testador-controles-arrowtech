@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testador de Controles Online (Drift &amp; WebHID) | ArrowTech</title>
+  <meta name="description" content="Testador de controles online gratuito da ArrowTech. Teste Stick Drift, Circularidade 360°, Botões, Gatilhos Adaptáveis PS5 DualSense (WebHID), PS4, Xbox e Switch em tempo real." />
+  <link rel="icon" type="image/png" href="assets/img/logo-icon.png" />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Consolas', 'monospace']
+          },
+          colors: {
+            arrow: {
+              deep: '#040911',
+              dark: '#07101e',
+              navy: '#0b192e',
+              blue: '#0088ff',
+              cyan: '#00e5ff',
+              teal: '#00d4b2',
+              sensor: '#f59e0b',
+              tmr: '#ff5500'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Estilos Modulares & Identidade Visual ArrowTech -->
+  <link rel="stylesheet" href="assets/css/theme.css" />
+  <style>
+    /* Estilos dedicados para o Overlay Interativo sobre os Controles Fotorealistas */
+    .svg-btn-overlay {
+      fill: rgba(0, 229, 255, 0.01);
+      stroke: rgba(0, 229, 255, 0.12);
+      stroke-width: 2;
+      transition: all 0.06s ease;
+    }
+    .svg-btn-active {
+      fill: rgba(0, 229, 255, 0.42) !important;
+      stroke: #00e5ff !important;
+      stroke-width: 4.5 !important;
+      filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.98));
+    }
+    .svg-stick-cap {
+      fill: rgba(10, 18, 32, 0.72);
+      stroke: #00e5ff;
+      stroke-width: 3.5;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
+      transition: transform 0.02s linear;
+    }
+    input[type="range"] {
+      accent-color: #00e5ff;
+    }
+  </style>
+</head>
+
+<body class="bg-circuit-pattern text-slate-100 antialiased selection:bg-cyan-400 selection:text-slate-950 min-h-screen flex flex-col">
+
+  <!-- ========================================================================
+       HEADER FIXO ARROWTECH (APENAS TESTADOR + ABA DE MANUTENÇÃO + REDES)
+       ======================================================================== -->
+  <header id="main-header" class="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-cyan-500/20">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4" aria-label="Navegação Principal">
+      <!-- Logo ArrowTech -->
+      <a href="index.html" class="flex items-center gap-3 shrink-0 group focus:outline-none">
+        <img src="assets/img/logo-icon.png"
+             alt="Ícone ArrowTech"
+             class="w-11 h-11 object-contain drop-shadow-[0_0_12px_rgba(0,229,255,0.45)] group-hover:scale-105 transition-transform shrink-0" />
+        <div class="flex flex-col justify-center">
+          <div class="font-display-tech text-xl sm:text-2xl font-extrabold tracking-tight leading-none whitespace-nowrap">
+            <span class="text-[#0088ff]">ARROW</span><span class="text-white">TECH</span>
+          </div>
+          <span class="text-[9px] font-semibold tracking-wider text-cyan-300/90 uppercase mt-1 whitespace-nowrap">
+            Gamepad &amp; WebHID Tester
+          </span>
+        </div>
+      </a>
+
+      <!-- Abas Principais do Site (Apenas Testador e Manutenção) -->
+      <div class="hidden md:flex items-center bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
+        <a href="index.html"
+           class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 shadow-[0_0_20px_rgba(0,229,255,0.15)] flex items-center gap-2 transition-all">
+          <span>🎯</span>
+          <span>Testador de Controles</span>
+        </a>
+        <a href="manutencao.html"
+           class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-2 transition-all">
+          <span>🛠️</span>
+          <span>Manutenção &amp; Upgrades</span>
+        </a>
+      </div>
+
+      <!-- Botões Rápidos: WhatsApp & Instagram -->
+      <div class="hidden sm:flex items-center gap-2.5 shrink-0">
+        <a href="https://instagram.com/_arrowtech"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn-outline-arrow px-3.5 py-2.5 rounded-xl text-xs uppercase tracking-wider inline-flex items-center gap-2">
+          <svg class="w-4 h-4 text-pink-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+          <span class="hidden lg:inline">Instagram</span>
+        </a>
+
+        <a href="https://wa.me/5511915364181?text=Ol%C3%A1%21%20Vim%20pelo%20Testador%20de%20Controles%20da%20ArrowTech%20e%20quero%20fazer%20um%20or%C3%A7amento."
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn-primary-arrow whitespace-nowrap px-4 sm:px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider inline-flex items-center justify-center gap-2 leading-none">
+          <span>WhatsApp</span>
+          <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </a>
+      </div>
+
+      <!-- Botão Menu Mobile -->
+      <button id="mobile-menu-btn"
+              type="button"
+              aria-expanded="false"
+              aria-controls="mobile-menu"
+              aria-label="Abrir menu de navegação"
+              class="md:hidden p-2.5 rounded-xl bg-slate-900/90 border border-cyan-500/30 text-cyan-300 hover:text-white shrink-0">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Menu Mobile -->
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-950/98 border-b border-cyan-500/30 px-4 pt-3 pb-5 space-y-2">
+      <a href="index.html" class="block py-2.5 px-3 rounded-xl text-sm font-extrabold bg-cyan-500/15 border border-cyan-400/40 text-cyan-300">
+        🎯 Testador de Controles (Principal)
+      </a>
+      <a href="manutencao.html" class="block py-2.5 px-3 rounded-xl text-sm font-bold text-slate-200 hover:bg-cyan-500/10 hover:text-cyan-300">
+        🛠️ Manutenção &amp; Upgrades
+      </a>
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        <a href="https://wa.me/5511915364181?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20ArrowTech%20e%20quero%20fazer%20um%20or%C3%A7amento."
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn-primary-arrow py-2.5 rounded-xl text-center text-xs uppercase tracking-wider">
+          WhatsApp
+        </a>
+        <a href="https://instagram.com/_arrowtech"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn-outline-arrow py-2.5 rounded-xl text-center text-xs uppercase tracking-wider">
+          Instagram
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast de Notificações Flutuante -->
+  <div id="tester-toast" class="hidden fixed top-24 right-6 z-50 max-w-md bg-slate-900/95 backdrop-blur-md border-2 border-cyan-400/50 rounded-2xl px-5 py-3.5 shadow-2xl flex items-center gap-3">
+    <span class="text-cyan-400 text-lg">⚡</span>
+    <p id="tester-toast-text" class="text-xs sm:text-sm font-semibold text-slate-100"></p>
+  </div>
+
+  <!-- ========================================================================
+       CONTEÚDO PRINCIPAL DO TESTADOR DE CONTROLES
+       ======================================================================== -->
+  <main class="pt-24 pb-20 flex-1">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+
+      <!-- ====================================================================
+           1ª SEÇÃO (PRIMEIRA COISA NA TELA): COCKPIT UNIFICADO
+           ESQUERDA (L2 + RADAR L3) | CENTRO (CONTROLE 1:1) | DIREITA (R2 + RADAR R3)
+           ==================================================================== -->
+      <section class="w-full tech-card rounded-3xl p-6 sm:p-8 border border-cyan-500/25 shadow-[0_0_45px_rgba(0,136,255,0.12)] space-y-6">
+        <!-- Cabeçalho Unificado do Cockpit + Status do Controle -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800/90 pb-5">
+          <div class="space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span class="inline-flex items-center gap-2 text-xs font-bold text-white bg-slate-950/90 px-3 py-1 rounded-full border border-slate-800">
+                <span id="conn-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-600 shrink-0"></span>
+                <span id="conn-controller-name">Aguardando controle (Pressione qualquer botão)</span>
+              </span>
+              <span id="conn-mode-tag" class="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                AGUARDANDO CONEXÃO
+              </span>
+              <span id="active-model-badge" class="hidden text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-md bg-slate-800 text-slate-400 border border-slate-700">
+                Auto-ID
+              </span>
+            </div>
+            <h1 id="cockpit-main-title" class="font-display-tech text-2xl sm:text-3xl font-extrabold text-white uppercase">
+              Testador de Controle &amp; <span class="text-gradient-arrow">Circularidade 360°</span>
+            </h1>
+            <p id="cockpit-subtitle" class="hidden text-xs sm:text-sm text-slate-300">
+              Siga os <strong class="text-cyan-300">2 passos simples</strong> abaixo acompanhando os círculos dos analógicos esquerdo e direito ao lado.
+            </p>
+          </div>
+
+          <!-- Botões de Alternância: Abrir Calibração / Voltar ao Testador -->
+          <div class="flex flex-wrap items-center gap-3 shrink-0">
+            <button id="btn-open-calibration"
+                    type="button"
+                    aria-expanded="false"
+                    class="hidden px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold uppercase tracking-wider bg-gradient-to-r from-cyan-500/20 to-blue-600/20 hover:from-cyan-500/30 hover:to-blue-600/30 text-cyan-300 border border-cyan-400/50 shadow-[0_0_20px_rgba(0,229,255,0.14)] transition-all inline-flex items-center gap-2 cursor-pointer">
+              <span>🎯</span>
+              <span>Calibrar Analógicos</span>
+            </button>
+
+            <button id="btn-close-calibration"
+                    type="button"
+                    class="hidden px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-cyan-500/40 transition-all inline-flex items-center gap-2 cursor-pointer shadow-sm">
+              <span>←</span>
+              <span>Voltar para o Testador</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Grid Inteligente de 12 Colunas: [3 cols: Radar L3] | [6 cols: Controle OU Guia de Calibração] | [3 cols: Radar R3] -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+
+          <!-- ALA ESQUERDA (3 cols): GATILHO L2/LT + RADAR DO ANALÓGICO ESQUERDO (L3) -->
+          <div class="xl:col-span-3 order-2 xl:order-1 bg-slate-950/90 rounded-2xl p-4 sm:p-5 border border-slate-800/90 flex flex-col justify-between space-y-4 shadow-inner">
+            <!-- Curso do Gatilho Esquerdo L2 / LT (Oculto durante a calibração para foco total no analógico) -->
+            <div id="trigger-box-l2" class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800/80">
+              <div class="flex justify-between items-center text-xs font-bold mb-2">
+                <span class="text-slate-300 uppercase tracking-wider">Gatilho L2 / LT</span>
+                <span id="val-l2-pct" class="font-mono text-sm font-extrabold text-cyan-300">0%</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                <div id="bar-l2" class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-75" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Cabeçalho do Analógico Esquerdo + Ícone Lupa Zoom 5x -->
+            <div class="flex items-center justify-between gap-2 pt-1">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 shrink-0"></span>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-white">Analógico Esquerdo (L3)</span>
+              </div>
+              <button type="button"
+                      data-toggle-zoom
+                      title="Zoom 5x no centro dos analógicos"
+                      aria-label="Alternar Zoom 5x nos analógicos"
+                      aria-pressed="false"
+                      class="w-7 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-cyan-300 border border-slate-800 hover:border-cyan-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0zM11 8v6m-3-3h6" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Radar 360° Esquerdo -->
+            <div class="flex items-center justify-center py-1">
+              <canvas id="canvas-stick-left" width="240" height="240" class="w-[210px] h-[210px] sm:w-[225px] sm:h-[225px] rounded-full shadow-[0_0_25px_rgba(0,229,255,0.08)]"></canvas>
+            </div>
+
+            <!-- Leitura Numérica LX / LY / Erro -->
+            <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-800/80 text-center">
+              <div class="bg-slate-900/90 rounded-xl p-2 border border-slate-800/60">
+                <span class="text-[10px] uppercase text-slate-400 block font-semibold">Eixo X</span>
+                <span id="val-lx" class="font-mono text-xs font-bold text-cyan-300">0.0000</span>
+              </div>
+              <div class="bg-slate-900/90 rounded-xl p-2 border border-slate-800/60">
+                <span class="text-[10px] uppercase text-slate-400 block font-semibold">Eixo Y</span>
+                <span id="val-ly" class="font-mono text-xs font-bold text-cyan-300">0.0000</span>
+              </div>
+              <div class="bg-slate-900/90 rounded-xl p-2 border border-slate-800/60">
+                <span class="text-[10px] uppercase text-slate-400 block font-semibold">Erro Circ.</span>
+                <span id="val-err-left" class="font-mono text-xs font-bold text-amber-400">0.0%</span>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- PALCO CENTRAL (6 cols): CONTROLE INTERATIVO 1:1 ENTRE OS DOIS ANALÓGICOS -->
+          <div id="controller-svg-stage" class="xl:col-span-6 order-1 xl:order-2 relative rounded-2xl border border-cyan-500/20 bg-[radial-gradient(ellipse_at_center,_rgba(0,136,255,0.13)_0%,_rgba(4,9,18,0.96)_72%)] p-4 sm:p-6 flex flex-col items-center justify-center min-h-[380px] overflow-hidden shadow-inner">
+
+            <!-- Botão Compacto e Elegante para Limpar Traçado dos Radares -->
+            <button id="btn-reset-circularity"
+                    type="button"
+                    title="Limpar traçado de circularidade dos dois analógicos"
+                    class="absolute top-3 right-3 z-20 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-slate-900/85 hover:bg-slate-800/95 text-slate-400 hover:text-cyan-300 border border-slate-800/90 hover:border-cyan-500/40 backdrop-blur-sm transition-all inline-flex items-center gap-1 cursor-pointer shadow-sm">
+              <span class="text-cyan-400 text-xs leading-none">↺</span>
+              <span>Limpar Traçado</span>
+            </button>
+
+            <!-- Estado Inicial: Aguardando Conexão -->
+            <div id="svg-idle-placeholder" class="py-12 px-6 text-center space-y-4 max-w-md">
+              <div class="w-20 h-20 mx-auto rounded-3xl bg-cyan-500/10 border border-cyan-400/30 flex items-center justify-center text-4xl shadow-[0_0_30px_rgba(0,229,255,0.15)] animate-pulse">
+                🎮
+              </div>
+              <h2 class="text-base sm:text-lg font-extrabold text-white uppercase tracking-wide">
+                Conecte seu Controle para Identificação
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Plugue no USB ou pareie via Bluetooth e <strong class="text-cyan-300">pressione qualquer botão</strong>. O controle oficial aparecerá aqui no centro, sincronizado com os radares esquerdo e direito ao lado.
+              </p>
+            </div>
+
+            <!-- ==============================================================
+                 1. SONY PLAYSTATION 5 DUALSENSE (Render Oficial + Overlay 1:1)
+                 ============================================================== -->
+            <svg data-controller-skin="ps5" viewBox="0 130 1000 740" class="w-full max-w-[560px] h-auto select-none hidden rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.75)]">
+              <image href="assets/img/controles/ps5-dualsense.jpg" x="0" y="0" width="1000" height="1000" preserveAspectRatio="xMidYMid slice" />
+
+              <!-- Indicadores Superiores de Gatilho L2 e R2 -->
+              <rect data-btn="l2Btn" x="148" y="146" width="124" height="32" rx="12" class="svg-btn-overlay" />
+              <rect data-trigger-fill="l2" x="148" y="146" width="124" height="0" rx="12" fill="rgba(0,229,255,0.55)" />
+              <text x="210" y="167" text-anchor="middle" fill="#94a3b8" font-size="18" font-weight="800">L2</text>
+
+              <rect data-btn="r2Btn" x="728" y="146" width="124" height="32" rx="12" class="svg-btn-overlay" />
+              <rect data-trigger-fill="r2" x="728" y="146" width="124" height="0" rx="12" fill="rgba(0,229,255,0.55)" />
+              <text x="790" y="167" text-anchor="middle" fill="#94a3b8" font-size="18" font-weight="800">R2</text>
+
+              <!-- Botões L1 e R1 -->
+              <ellipse data-btn="l1" cx="210" cy="210" rx="64" ry="18" transform="rotate(-7 210 210)" class="svg-btn-overlay" />
+              <ellipse data-btn="r1" cx="790" cy="210" rx="64" ry="18" transform="rotate(7 790 210)" class="svg-btn-overlay" />
+
+              <!-- Lightbar RGB Dinâmica -->
+              <path data-lightbar
+                    d="M 309 224 L 336 392 M 691 224 L 664 392"
+                    fill="none"
+                    stroke="rgb(0, 229, 255)"
+                    stroke-width="9"
+                    stroke-linecap="round"
+                    filter="drop-shadow(0 0 14px rgba(0,229,255,0.95))" />
+
+              <!-- Touchpad Trapezoidal + Tracker Interativo -->
+              <defs>
+                <clipPath id="ds5TouchClip">
+                  <path d="M 314 212 L 686 212 L 660 392 L 340 392 Z" />
+                </clipPath>
+              </defs>
+              <path data-btn="touchpad" d="M 314 212 L 686 212 L 660 392 L 340 392 Z" class="svg-btn-overlay cursor-pointer" />
+
+              <g clip-path="url(#ds5TouchClip)" pointer-events="none">
+                <line x1="500" y1="212" x2="500" y2="392" stroke="rgba(15,23,42,0.16)" stroke-width="1.5" stroke-dasharray="4 4" />
+                <line x1="314" y1="302" x2="686" y2="302" stroke="rgba(15,23,42,0.16)" stroke-width="1.5" stroke-dasharray="4 4" />
+                <polyline data-touch-trail="1" points="" fill="none" stroke="rgba(0, 136, 255, 0.75)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                <line data-touch-line-x="1" x1="500" y1="212" x2="500" y2="392" stroke="rgba(0, 136, 255, 0.65)" stroke-width="2" stroke-dasharray="4 3" />
+                <line data-touch-line-y="1" x1="314" y1="302" x2="686" y2="302" stroke="rgba(0, 136, 255, 0.65)" stroke-width="2" stroke-dasharray="4 3" />
+                <circle data-touch="1" cx="500" cy="302" r="13" fill="rgba(0, 229, 255, 0.35)" stroke="#0088ff" stroke-width="4" />
+                <circle data-touch-core="1" cx="500" cy="302" r="4.5" fill="#0f172a" />
+                <line data-touch-line-x="2" x1="540" y1="212" x2="540" y2="392" stroke="rgba(245, 158, 11, 0.65)" stroke-width="2" stroke-dasharray="4 3" class="hidden" />
+                <line data-touch-line-y="2" x1="314" y1="302" x2="686" y2="302" stroke="rgba(245, 158, 11, 0.65)" stroke-width="2" stroke-dasharray="4 3" class="hidden" />
+                <circle data-touch="2" cx="540" cy="302" r="13" fill="rgba(245, 158, 11, 0.4)" stroke="#d97706" stroke-width="4" class="hidden" />
+              </g>
+
+              <!-- 5 Player LEDs na base do Touchpad -->
+              <g transform="translate(500, 405)">
+                <rect data-player-led="1" x="-52" y="0" width="16" height="5" rx="2.5" fill="#334155" />
+                <rect data-player-led="2" x="-28" y="0" width="16" height="5" rx="2.5" fill="#334155" />
+                <rect data-player-led="3" x="-8" y="0" width="16" height="5" rx="2.5" fill="#f8fafc" />
+                <rect data-player-led="4" x="12" y="0" width="16" height="5" rx="2.5" fill="#334155" />
+                <rect data-player-led="5" x="36" y="0" width="16" height="5" rx="2.5" fill="#334155" />
+              </g>
+
+              <!-- Create & Options -->
+              <rect data-btn="create" x="267" y="242" width="28" height="44" rx="14" transform="rotate(-12 281 264)" class="svg-btn-overlay" />
+              <rect data-btn="options" x="705" y="242" width="28" height="44" rx="14" transform="rotate(12 719 264)" class="svg-btn-overlay" />
+
+              <!-- D-Pad Esquerdo -->
+              <rect data-btn="up" x="180" y="284" width="56" height="58" rx="16" class="svg-btn-overlay" />
+              <rect data-btn="down" x="180" y="382" width="56" height="58" rx="16" class="svg-btn-overlay" />
+              <rect data-btn="left" x="128" y="336" width="58" height="56" rx="16" class="svg-btn-overlay" />
+              <rect data-btn="right" x="228" y="336" width="58" height="56" rx="16" class="svg-btn-overlay" />
+
+              <!-- Botões Sagrados PlayStation (△ ○ ✕ □) -->
+              <circle data-btn="triangle" cx="791" cy="298" r="33" class="svg-btn-overlay" />
+              <circle data-btn="circle" cx="858" cy="365" r="33" class="svg-btn-overlay" />
+              <circle data-btn="cross" cx="791" cy="432" r="33" class="svg-btn-overlay" />
+              <circle data-btn="square" cx="724" cy="365" r="33" class="svg-btn-overlay" />
+
+              <!-- Botão PS e Mute -->
+              <circle data-btn="ps" cx="500" cy="485" r="28" class="svg-btn-overlay" />
+              <rect data-btn="mute" x="475" y="536" width="50" height="16" rx="8" class="svg-btn-overlay" />
+
+              <!-- Analógicos Simétricos Inferiores (L3 e R3) -->
+              <g transform="translate(350, 488)">
+                <g data-stick="left">
+                  <circle data-btn="l3" cx="0" cy="0" r="54" class="svg-stick-cap" />
+                  <circle cx="0" cy="0" r="34" fill="none" stroke="rgba(0,229,255,0.45)" stroke-width="2" stroke-dasharray="6 4" />
+                  <circle cx="0" cy="0" r="6" fill="#00e5ff" />
+                </g>
+              </g>
+
+              <g transform="translate(650, 488)">
+                <g data-stick="right">
+                  <circle data-btn="r3" cx="0" cy="0" r="54" class="svg-stick-cap" />
+                  <circle cx="0" cy="0" r="34" fill="none" stroke="rgba(0,229,255,0.45)" stroke-width="2" stroke-dasharray="6 4" />
+                  <circle cx="0" cy="0" r="6" fill="#00e5ff" />
+                </g>
+              </g>
+            </svg>
+
+
+            <!-- ==============================================================
+                 2. SONY PLAYSTATION 4 DUALSHOCK 4 (Render Oficial + Overlay 1:1)
+                 ============================================================== -->
+            <svg data-controller-skin="ps4" viewBox="0 130 1000 740" class="w-full max-w-[560px] h-auto select-none hidden rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.75)]">
+              <image href="assets/img/controles/ps4-dualshock4.jpg" x="0" y="0" width="1000" height="1000" preserveAspectRatio="xMidYMid slice" />
+
+              <rect data-btn="l2Btn" x="150" y="192" width="116" height="32" rx="12" class="svg-btn-overlay" />
+              <rect data-trigger-fill="l2" x="150" y="192" width="116" height="0" rx="12" fill="rgba(0,229,255,0.55)" />
+              <text x="208" y="214" text-anchor="middle" fill="#94a3b8" font-size="18" font-weight="800">L2</text>
+
+              <rect data-btn="r2Btn" x="734" y="192" width="116" height="32" rx="12" class="svg-btn-overlay" />
+              <rect data-trigger-fill="r2" x="734" y="192" width="116" height="0" rx="12" fill="rgba(0,229,255,0.55)" />
+              <text x="792" y="214" text-anchor="middle" fill="#94a3b8" font-size="18" font-weight="800">R2</text>
+
+              <ellipse data-btn="l1" cx="208" cy="254" rx="58" ry="16" class="svg-btn-overlay" />
+              <ellipse data-btn="r1" cx="792" cy="254" rx="58" ry="16" class="svg-btn-overlay" />
+
+              <defs>
+                <clipPath id="ds4TouchClip">
+                  <rect x="344" y="274" width="312" height="174" rx="16" />
+                </clipPath>
+              </defs>
+              <rect data-btn="touchpad" x="344" y="274" width="312" height="174" rx="16" class="svg-btn-overlay cursor-pointer" />
+              <line data-lightbar x1="375" y1="298" x2="625" y2="298" stroke="rgb(0, 136, 255)" stroke-width="8" stroke-linecap="round" filter="drop-shadow(0 0 12px rgba(0,136,255,0.95))" />
+
+              <g clip-path="url(#ds4TouchClip)" pointer-events="none">
+                <line x1="500" y1="274" x2="500" y2="448" stroke="rgba(0,229,255,0.16)" stroke-width="1.5" stroke-dasharray="4 4" />
+                <line x1="344" y1="361" x2="656" y2="361" stroke="rgba(0,229,255,0.16)" stroke-width="1.5" stroke-dasharray="4 4" />
+                <polyline data-touch-trail="1" points="" fill="none" stroke="rgba(0, 229, 255, 0.7)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                <line data-touch-line-x="1" x1="500" y1="274" x2="500" y2="448" stroke="rgba(0, 229, 255, 0.55)" stroke-width="2" stroke-dasharray="4 3" />
+                <line data-touch-line-y="1" x1="344" y1="361" x2="656" y2="361" stroke="rgba(0, 229, 255, 0.55)" stroke-width="2" stroke-dasharray="4 3" />
+                <circle data-touch="1" cx="500" cy="360" r="13" fill="rgba(0, 229, 255, 0.35)" stroke="#00e5ff" stroke-width="4" />
+                <circle data-touch-core="1" cx="500" cy="360" r="4.5" fill="#ffffff" />
+                <circle data-touch="2" cx="540" cy="360" r="13" fill="rgba(245, 158, 11, 0.4)" stroke="#f59e0b" stroke-width="4" class="hidden" />
+              </g>
+
+              <rect data-btn="create" x="290" y="296" width="30" height="52" rx="15" class="svg-btn-overlay" />
+              <rect data-btn="options" x="678" y="296" width="30" height="52" rx="15" class="svg-btn-overlay" />
+
+              <rect data-btn="up" x="176" y="334" width="56" height="58" rx="14" class="svg-btn-overlay" />
+              <rect data-btn="down" x="176" y="432" width="56" height="58" rx="14" class="svg-btn-overlay" />
+              <rect data-btn="left" x="124" y="384" width="58" height="56" rx="14" class="svg-btn-overlay" />
+              <rect data-btn="right" x="224" y="384" width="58" height="56" rx="14" class="svg-btn-overlay" />
+
+              <circle data-btn="triangle" cx="796" cy="345" r="33" class="svg-btn-overlay" />
+              <circle data-btn="circle" cx="864" cy="414" r="33" class="svg-btn-overlay" />
+              <circle data-btn="cross" cx="796" cy="484" r="33" class="svg-btn-overlay" />
+              <circle data-btn="square" cx="726" cy="414" r="33" class="svg-btn-overlay" />
+
+              <circle data-btn="ps" cx="500" cy="552" r="28" class="svg-btn-overlay" />
+
+              <g transform="translate(348, 554)">
+                <g data-stick="left">
+                  <circle data-btn="l3" cx="0" cy="0" r="56" class="svg-stick-cap" />
+                  <circle cx="0" cy="0" r="36" fill="none" stroke="rgba(0,229,255,0.45)" stroke-width="2" stroke-dasharray="6 4" />
+                  <circle cx="0" cy="0" r="6" fill="#00e5ff" />
+                </g>
+              </g>
+
+              <g transform="translate(652, 554)">
+                <g data-stick="right">
+                  <circle data-btn="r3" cx="0" cy="0" r="56" class="svg-stick-cap" />
+                  <circle cx="0" cy="0" r="36" fill="none" stroke="rgba(0,229,255,0.45)" stroke-width="2" stroke-dasharray="6 4" />
+                  <circle cx="0" cy="0" r="6" fill="#00e5ff" />
+                </g>
+              </g>
+            </svg>
+
+
+            <!-- ==============================================================
+                 3. MICROSOFT XBOX SERIES X|S (Render Oficial + Overlay 1:1)
+                 ============================================================== -->
+            <svg data-controller-skin="xbox" viewBox="0 130 1000 740" class="w-full max-w-[560px] h-auto select-none hidden rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.75)]">
+              <image href="assets/img/controles/xbox-series.jpg" x="0" y="0" width="1000" height="1000" preserveAspectRatio="xMidYMid slice" />
+
+              <rect data-btn="l2Btn" x="185" y="145" width="136" height="32" rx="12" class="svg-btn-overlay" />
+              <rect data-trigger-fill="l2" x="185" y="145" width="136" height="0" rx="12" fill="rgba(16,185,129,0.55)" />
+              <text x="253" y="167" text-anchor="middle" fill="#94a3b8" font-size="18" font-weight="800">LT</text>
+
+              <rect data-btn="r2Btn" x="679" y="145" width="136" height="32" rx="12" class="svg-btn-overlay" />
+              <rect data-trigger-fill="r2" x="679" y="145" width="136" height="0" rx="12" fill="rgba(16,185,129,0.55)" />
+              <text x="747" y="167" text-anchor="middle" fill="#94a3b8" font-size="18" font-weight="800">RT</text>
+
+              <ellipse data-btn="l1" cx="255" cy="205" rx="74" ry="18" transform="rotate(-8 255 205)" class="svg-btn-overlay" />
+              <ellipse data-btn="r1" cx="745" cy="205" rx="74" ry="18" transform="rotate(8 745 205)" class="svg-btn-overlay" />
+
+              <circle data-btn="ps" cx="500" cy="268" r="38" class="svg-btn-overlay" />
+              <circle data-btn="create" cx="428" cy="364" r="23" class="svg-btn-overlay" />
+              <circle data-btn="options" cx="570" cy="364" r="23" class="svg-btn-overlay" />
+              <rect data-btn="touchpad" x="474" y="400" width="52" height="32" rx="16" class="svg-btn-overlay" />
+
+              <g transform="translate(254, 362)">
+                <g data-stick="left">
+                  <circle data-btn="l3" cx="0" cy="0" r="56" class="svg-stick-cap" />
+                  <circle cx="0" cy="0" r="35" fill="none" stroke="rgba(16,185,129,0.55)" stroke-width="2" stroke-dasharray="6 4" />
+                  <circle cx="0" cy="0" r="6" fill="#10b981" />
+                </g>
+              </g>
+
+              <rect data-btn="up" x="346" y="446" width="56" height="52" rx="12" class="svg-btn-overlay" />
+              <rect data-btn="down" x="346" y="542" width="56" height="52" rx="12" class="svg-btn-overlay" />
+              <rect data-btn="left" x="298" y="492" width="52" height="56" rx="12" class="svg-btn-overlay" />
+              <rect data-btn="right" x="398" y="492" width="52" height="56" rx="12" class="svg-btn-overlay" />
+
+              <circle data-btn="triangle" cx="745" cy="300" r="33" class="svg-btn-overlay" />
+              <circle data-btn="circle" cx="812" cy="366" r="33" class="svg-btn-overlay" />
+              <circle data-btn="cross" cx="745" cy="432" r="33" class="svg-btn-overlay" />
+              <circle data-btn="square" cx="680" cy="366" r="33" class="svg-btn-overlay" />
+
+              <g transform="translate(625, 505)">
+                <g data-stick="right">
+                  <circle data-btn="r3" cx="0" cy="0" r="56" class="svg-stick-cap" />
+                  <circle cx="0" cy="0" r="35" fill="none" stroke="rgba(16,185,129,0.55)" stroke-width="2" stroke-dasharray="6 4" />
+                  <circle cx="0" cy="0" r="6" fill="#10b981" />
+                </g>
+              </g>
+            </svg>
+
+
+            <!-- ==============================================================
+                 4. NINTENDO SWITCH PRO CONTROLLER (Render Oficial + Overlay 1:1)
+                 ============================================================== -->
+            <svg data-controller-skin="switch" viewBox="0 130 1000 740" class="w-full max-w-[560px] h-auto select-none hidden rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.75)]">
+              <image href="assets/img/controles/switch-pro.jpg" x="0" y="0" width="1000" height="1000" preserveAspectRatio="xMidYMid slice" />
+
+              <rect data-btn="l2Btn" x="165" y="142" width="136" height="32" rx="12" class="svg-btn-overlay" />
+              <rect data-trigger-fill="l2" x="165" y="142" width="136" height="0" rx="12" fill="rgba(0,229,255,0.55)" />
+              <text x="233" y="164" text-anchor="middle" fill="#94a3b8" font-size="18" font-weight="800">ZL</text>
+
+              <rect data-btn="r2Btn" x="699" y="142" width="136" height="32" rx="12" class="svg-btn-overlay" />
+              <rect data-trigger-fill="r2" x="699" y="142" width="136" height="0" rx="12" fill="rgba(0,229,255,0.55)" />
+              <text x="767" y="164" text-anchor="middle" fill="#94a3b8" font-size="18" font-weight="800">ZR</text>
+
+              <ellipse data-btn="l1" cx="235" cy="198" rx="75" ry="18" transform="rotate(-8 235 198)" class="svg-btn-overlay" />
+              <ellipse data-btn="r1" cx="765" cy="198" rx="75" ry="18" transform="rotate(8 765 198)" class="svg-btn-overlay" />
+
+              <circle data-btn="create" cx="376" cy="294" r="24" class="svg-btn-overlay" />
+              <circle data-btn="options" cx="624" cy="294" r="24" class="svg-btn-overlay" />
+              <rect data-btn="touchpad" x="408" y="346" width="42" height="42" rx="8" class="svg-btn-overlay" />
+              <circle data-btn="ps" cx="570" cy="368" r="26" class="svg-btn-overlay" />
+
+              <g transform="translate(230, 365)">
+                <g data-stick="left">
+                  <circle data-btn="l3" cx="0" cy="0" r="56" class="svg-stick-cap" />
+                  <circle cx="0" cy="0" r="35" fill="none" stroke="rgba(0,229,255,0.45)" stroke-width="2" stroke-dasharray="6 4" />
+                  <circle cx="0" cy="0" r="6" fill="#00e5ff" />
+                </g>
+              </g>
+
+              <rect data-btn="up" x="326" y="426" width="52" height="52" rx="10" class="svg-btn-overlay" />
+              <rect data-btn="down" x="326" y="526" width="52" height="52" rx="10" class="svg-btn-overlay" />
+              <rect data-btn="left" x="276" y="476" width="52" height="52" rx="10" class="svg-btn-overlay" />
+              <rect data-btn="right" x="376" y="476" width="52" height="52" rx="10" class="svg-btn-overlay" />
+
+              <circle data-btn="triangle" cx="762" cy="298" r="34" class="svg-btn-overlay" />
+              <circle data-btn="circle" cx="834" cy="366" r="34" class="svg-btn-overlay" />
+              <circle data-btn="cross" cx="762" cy="434" r="34" class="svg-btn-overlay" />
+              <circle data-btn="square" cx="690" cy="366" r="34" class="svg-btn-overlay" />
+
+              <g transform="translate(630, 502)">
+                <g data-stick="right">
+                  <circle data-btn="r3" cx="0" cy="0" r="56" class="svg-stick-cap" />
+                  <circle cx="0" cy="0" r="35" fill="none" stroke="rgba(0,229,255,0.45)" stroke-width="2" stroke-dasharray="6 4" />
+                  <circle cx="0" cy="0" r="6" fill="#00e5ff" />
+                </g>
+              </g>
+            </svg>
+          </div>
+
+          <!-- ÁREA CENTRAL DE CALIBRAÇÃO GUIADA (6 cols - Substitui a imagem do controle ao clicar em Calibrar) -->
+          <div id="calibration-panel" class="hidden xl:col-span-6 order-1 xl:order-2 rounded-2xl border border-slate-800/90 bg-slate-950/90 p-5 sm:p-6 flex flex-col justify-between space-y-5 shadow-inner">
+
+            <!-- Topo: Barra Visual de Passos (1 -> 2 -> Concluído) -->
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3.5">
+              <div class="flex items-center gap-2 text-xs font-bold">
+                <span id="step-pill-1" class="px-2.5 py-1 rounded-lg bg-slate-900 text-cyan-300 border border-cyan-500/35">
+                  1. Centralizar
+                </span>
+                <span class="text-slate-600">➔</span>
+                <span id="step-pill-2" class="px-2.5 py-1 rounded-lg bg-slate-900 text-slate-400 border border-slate-800">
+                  2. Girar 360°
+                </span>
+                <span class="text-slate-600">➔</span>
+                <span id="step-pill-3" class="px-2.5 py-1 rounded-lg bg-slate-900 text-slate-400 border border-slate-800">
+                  Concluído
+                </span>
+              </div>
+
+              <span id="calib-mode-badge" class="text-[10px] font-bold uppercase px-2.5 py-1 rounded-md bg-slate-900 text-slate-400 border border-slate-800">
+                WebHID Conectado
+              </span>
+            </div>
+
+            <!-- PASSO 1: CENTRALIZAR OS ANALÓGICOS -->
+            <div id="calib-card-step1" class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-4 sm:p-5 space-y-3.5 transition-all">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-xs font-extrabold text-cyan-300 shrink-0">
+                    1
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Passo 1 de 2</span>
+                    <h2 class="text-sm sm:text-base font-extrabold text-white">
+                      Deixe os analógicos soltos e parados
+                    </h2>
+                  </div>
+                </div>
+                <span id="calib-center-status" class="text-[10px] font-bold uppercase px-2.5 py-1 rounded-md bg-slate-950 text-slate-400 border border-slate-800 shrink-0">
+                  Pendente
+                </span>
+              </div>
+
+              <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Apoie o controle ou segure-o <strong class="text-slate-200">sem encostar nos analógicos</strong>. Em seguida, clique no botão abaixo para ensinar ao controle onde fica o meio exato.
+              </p>
+
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
+                <div class="flex items-center gap-2 text-[11px] font-mono text-slate-400">
+                  <span class="bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800/80">
+                    L3: <strong id="calib-offset-l" class="text-slate-200">0.000, 0.000</strong>
+                  </span>
+                  <span class="bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800/80">
+                    R3: <strong id="calib-offset-r" class="text-slate-200">0.000, 0.000</strong>
+                  </span>
+                </div>
+
+                <button id="btn-calib-center"
+                        type="button"
+                        class="py-2.5 px-5 rounded-xl text-xs font-extrabold uppercase tracking-wider bg-slate-950 hover:bg-slate-800 text-cyan-300 border border-cyan-500/35 transition-all inline-flex items-center justify-center gap-2 cursor-pointer shrink-0">
+                  <span>1. Calibrar o Centro</span>
+                </button>
+              </div>
+            </div>
+
+              <!-- PASSO 2: GIRAR 360° NAS BORDAS (OPCIONAL SE QUISER SÓ O CENTRO) -->
+            <div id="calib-card-step2" class="rounded-2xl bg-slate-900/90 border border-slate-800/90 p-4 sm:p-5 space-y-3.5 transition-all">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-xs font-extrabold text-cyan-300 shrink-0">
+                    2
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Passo 2 de 2 (Opcional)</span>
+                    <h2 class="text-sm sm:text-base font-extrabold text-white">
+                      Gire os dois analógicos em círculo (360°)
+                    </h2>
+                  </div>
+                </div>
+                <span id="calib-range-status" class="text-[10px] font-bold uppercase px-2.5 py-1 rounded-md bg-slate-950 text-slate-400 border border-slate-800 shrink-0">
+                  Aguardando
+                </span>
+              </div>
+
+              <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Se quiser calibrar também as bordas, clique em <strong class="text-slate-200">Começar Giro</strong> e dê <strong class="text-slate-200">3 voltas completas</strong>. Ou, se calibrou apenas o centro acima, já pode clicar direto em <strong class="text-cyan-300">Salvar no Controle</strong>.
+              </p>
+
+              <!-- Barra de Progresso Limpa e Sobria -->
+              <div class="bg-slate-950/90 rounded-xl p-3 border border-slate-800/80 space-y-2">
+                <div class="flex items-center justify-between text-xs font-bold">
+                  <span id="calib-range-hint" class="text-slate-400">Calibre o centro (Passo 1) ou inicie o giro 360°</span>
+                  <span id="calib-range-pct" class="font-mono text-sm font-extrabold text-cyan-300">0%</span>
+                </div>
+                <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                  <div id="calib-range-bar" class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-100" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                <button id="btn-calib-range-start"
+                        type="button"
+                        class="py-2.5 px-4 rounded-xl text-xs font-extrabold uppercase tracking-wider bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-700 transition-all inline-flex items-center justify-center gap-2 cursor-pointer">
+                  <span>2. Começar Giro 360°</span>
+                </button>
+                <button id="btn-calib-range-save"
+                        type="button"
+                        disabled
+                        class="py-2.5 px-4 rounded-xl text-xs font-extrabold uppercase tracking-wider bg-slate-950 hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none text-cyan-300 border border-cyan-500/35 transition-all inline-flex items-center justify-center gap-2 cursor-pointer">
+                  <span>Salvar no Controle</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Banner de Sucesso Discreto (Exibido ao finalizar) -->
+            <div id="calib-done-banner" class="hidden rounded-xl bg-slate-900 border border-cyan-500/30 px-4 py-3 text-xs text-slate-200 flex items-center justify-between gap-3">
+              <span><strong class="text-cyan-300">Calibração concluída.</strong> Teste os analógicos nos círculos ao lado para conferir o resultado.</span>
+            </div>
+
+            <!-- Rodapé Simples do Assistente -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
+              <button id="btn-calib-reset"
+                      type="button"
+                      class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-colors cursor-pointer">
+                ↺ Restaurar Padrão
+              </button>
+
+              <button id="btn-calib-back-bottom"
+                      type="button"
+                      class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700 transition-colors cursor-pointer">
+                ← Voltar ao Testador
+              </button>
+            </div>
+          </div>
+
+
+          <!-- ALA DIREITA (3 cols): GATILHO R2/RT + RADAR DO ANALÓGICO DIREITO (R3) -->
+          <div class="xl:col-span-3 order-3 bg-slate-950/90 rounded-2xl p-4 sm:p-5 border border-slate-800/90 flex flex-col justify-between space-y-4 shadow-inner">
+            <!-- Curso do Gatilho Direito R2 / RT (Oculto durante a calibração para foco total no analógico) -->
+            <div id="trigger-box-r2" class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800/80">
+              <div class="flex justify-between items-center text-xs font-bold mb-2">
+                <span class="text-slate-300 uppercase tracking-wider">Gatilho R2 / RT</span>
+                <span id="val-r2-pct" class="font-mono text-sm font-extrabold text-cyan-300">0%</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                <div id="bar-r2" class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-75" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Cabeçalho do Analógico Direito + Ícone Lupa Zoom 5x -->
+            <div class="flex items-center justify-between gap-2 pt-1">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 shrink-0"></span>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-white">Analógico Direito (R3)</span>
+              </div>
+              <button type="button"
+                      data-toggle-zoom
+                      title="Zoom 5x no centro dos analógicos"
+                      aria-label="Alternar Zoom 5x nos analógicos"
+                      aria-pressed="false"
+                      class="w-7 h-7 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-cyan-300 border border-slate-800 hover:border-cyan-500/40 flex items-center justify-center transition-all cursor-pointer shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0zM11 8v6m-3-3h6" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Radar 360° Direito -->
+            <div class="flex items-center justify-center py-1">
+              <canvas id="canvas-stick-right" width="240" height="240" class="w-[210px] h-[210px] sm:w-[225px] sm:h-[225px] rounded-full shadow-[0_0_25px_rgba(0,229,255,0.08)]"></canvas>
+            </div>
+
+            <!-- Leitura Numérica RX / RY / Erro -->
+            <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-800/80 text-center">
+              <div class="bg-slate-900/90 rounded-xl p-2 border border-slate-800/60">
+                <span class="text-[10px] uppercase text-slate-400 block font-semibold">Eixo X</span>
+                <span id="val-rx" class="font-mono text-xs font-bold text-cyan-300">0.0000</span>
+              </div>
+              <div class="bg-slate-900/90 rounded-xl p-2 border border-slate-800/60">
+                <span class="text-[10px] uppercase text-slate-400 block font-semibold">Eixo Y</span>
+                <span id="val-ry" class="font-mono text-xs font-bold text-cyan-300">0.0000</span>
+              </div>
+              <div class="bg-slate-900/90 rounded-xl p-2 border border-slate-800/60">
+                <span class="text-[10px] uppercase text-slate-400 block font-semibold">Erro Circ.</span>
+                <span id="val-err-right" class="font-mono text-xs font-bold text-amber-400">0.0%</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- BARRA INFERIOR INTELIGENTE WEBHID -->
+        <div id="webhid-connect-bar" class="pt-5 border-t border-slate-800/90 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="flex items-start sm:items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-cyan-500/15 border border-cyan-400/30 flex items-center justify-center text-cyan-300 shrink-0">
+              ⚡
+            </span>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              <strong class="text-white">Por que conectar via WebHID?</strong> Libera nos controles PlayStation (PS5/PS4) a <strong class="text-cyan-300">Calibração de Analógicos</strong>, <strong class="text-cyan-300">Gatilhos Adaptáveis L2/R2</strong>, <strong class="text-cyan-300">Touchpad Multitoque</strong>, <strong class="text-cyan-300">LED RGB</strong>, <strong class="text-cyan-300">Giroscópio</strong> e leitura de <strong class="text-cyan-300">Bateria/Placa</strong>.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 shrink-0">
+            <span id="webhid-support-badge" class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+              WebHID
+            </span>
+            <button id="btn-connect-webhid"
+                    type="button"
+                    class="btn-primary-arrow px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider inline-flex items-center justify-center gap-2 cursor-pointer">
+              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span>Conectar DualSense / DS4 (WebHID)</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ====================================================================
+           SEÇÕES EM TELA CHEIA (EXIBIDAS DINAMICAMENTE CONFORME O CONTROLE DETECTADO):
+           ==================================================================== -->
+      <div id="tester-extra-sections" class="space-y-8">
+
+        <!-- GATILHOS ADAPTÁVEIS DUALSENSE (Apenas PS5 WebHID) -->
+        <section id="section-adaptive-triggers" class="hidden w-full tech-card rounded-3xl p-6 sm:p-8 border border-cyan-500/25 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/90 pb-5">
+            <div>
+              <div class="flex items-center gap-2.5 mb-1">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-400">Exclusivo PS5 DualSense</span>
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Force Feedback</span>
+              </div>
+              <h3 class="font-display-tech text-2xl sm:text-3xl font-extrabold text-white uppercase">
+                Gatilhos Adaptáveis (L2 &amp; R2)
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1">
+                Teste os motores internos e engrenagens dos gatilhos adaptativos do PS5 em tempo real.
+              </p>
+            </div>
+
+            <button id="btn-apply-triggers"
+                    type="button"
+                    class="btn-outline-arrow px-6 py-3 rounded-xl text-xs sm:text-sm uppercase tracking-wider shrink-0">
+              Aplicar nos Gatilhos do DualSense
+            </button>
+          </div>
+
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-3">Modos Rápidos de Teste:</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <button type="button" data-trigger-preset="off" class="px-4 py-3 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 transition-all">
+                🔓 Livre (Sem Força)
+              </button>
+              <button type="button" data-trigger-preset="bow" class="px-4 py-3 rounded-xl text-xs sm:text-sm font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 transition-all">
+                🏹 Arco Tenso (Pesado)
+              </button>
+              <button type="button" data-trigger-preset="pistol" class="px-4 py-3 rounded-xl text-xs sm:text-sm font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition-all">
+                🔫 Gatilho de Arma (Trava)
+              </button>
+              <button type="button" data-trigger-preset="machinegun" class="px-4 py-3 rounded-xl text-xs sm:text-sm font-bold bg-orange-500/15 hover:bg-orange-500/25 text-orange-300 border border-orange-500/30 transition-all">
+                ⚡ Metralhadora (Pulso)
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="space-y-3 bg-slate-950/85 p-5 rounded-2xl border border-slate-800/90">
+              <div class="flex items-center justify-between">
+                <label for="sel-l2-mode" class="text-sm font-extrabold uppercase text-white">Gatilho Esquerdo (L2)</label>
+                <span id="lbl-l2-force" class="text-sm font-mono font-bold text-cyan-300">71%</span>
+              </div>
+              <select id="sel-l2-mode" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400">
+                <option value="off">Desligado (Macio)</option>
+                <option value="continuous">Resistência Contínua (Pedal / Arco)</option>
+                <option value="section">Resistência em Seção (Trava de Tiro)</option>
+                <option value="pulse">Vibração / Pulso Rápido</option>
+              </select>
+              <input id="rng-l2-force" type="range" min="20" max="255" value="180" class="w-full" />
+            </div>
+
+            <div class="space-y-3 bg-slate-950/85 p-5 rounded-2xl border border-slate-800/90">
+              <div class="flex items-center justify-between">
+                <label for="sel-r2-mode" class="text-sm font-extrabold uppercase text-white">Gatilho Direito (R2)</label>
+                <span id="lbl-r2-force" class="text-sm font-mono font-bold text-cyan-300">71%</span>
+              </div>
+              <select id="sel-r2-mode" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-400">
+                <option value="off">Desligado (Macio)</option>
+                <option value="continuous">Resistência Contínua (Pedal / Arco)</option>
+                <option value="section">Resistência em Seção (Trava de Tiro)</option>
+                <option value="pulse">Vibração / Pulso Rápido</option>
+              </select>
+              <input id="rng-r2-force" type="range" min="20" max="255" value="180" class="w-full" />
+            </div>
+          </div>
+        </section>
+
+
+        <!-- VIBRAÇÃO (RUMBLE) + LED RGB / PLAYER LEDS -->
+        <section id="section-actuators" class="hidden w-full tech-card rounded-3xl p-6 sm:p-8 border border-cyan-500/25 space-y-6">
+          <div class="border-b border-slate-800/90 pb-5">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-400 block mb-1">
+              Atuadores do Controle Identificado
+            </span>
+            <h3 id="title-actuators" class="font-display-tech text-2xl sm:text-3xl font-extrabold text-white uppercase">
+              Vibração &amp; Barra de Luz RGB
+            </h3>
+            <p id="desc-actuators" class="text-xs sm:text-sm text-slate-400 mt-1">
+              Teste os motores de vibração e recursos luminosos exclusivos do modelo conectado.
+            </p>
+          </div>
+
+          <div id="grid-actuators" class="grid grid-cols-1 gap-6">
+            <div class="bg-slate-950/85 p-5 rounded-2xl border border-slate-800/90 flex flex-col justify-between space-y-4">
+              <div class="space-y-4">
+                <span class="text-sm font-extrabold uppercase text-white block">Teste de Motores de Vibração (Rumble)</span>
+                <div class="flex items-center justify-between text-xs sm:text-sm font-bold">
+                  <span class="text-slate-300">Motor Forte (Esquerdo)</span>
+                  <input id="rng-rumble-heavy" type="range" min="0" max="255" value="220" class="w-44 sm:w-56" />
+                </div>
+                <div class="flex items-center justify-between text-xs sm:text-sm font-bold">
+                  <span class="text-slate-300">Motor Suave (Direito)</span>
+                  <input id="rng-rumble-soft" type="range" min="0" max="255" value="220" class="w-44 sm:w-56" />
+                </div>
+              </div>
+              <div class="flex gap-3 pt-2">
+                <button id="btn-test-rumble"
+                        type="button"
+                        class="flex-1 btn-primary-arrow py-3 rounded-xl text-xs sm:text-sm uppercase tracking-wider">
+                  📳 Testar Vibração (1.2s)
+                </button>
+                <button id="btn-stop-rumble"
+                        type="button"
+                        class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 text-slate-300 border border-slate-700 hover:text-white">
+                  Parar
+                </button>
+              </div>
+            </div>
+
+            <div id="box-lightbar-rgb" class="hidden bg-slate-950/85 p-5 rounded-2xl border border-slate-800/90 space-y-4">
+              <div class="flex items-center justify-between">
+                <label for="inp-lightbar-color" class="text-sm font-extrabold uppercase text-white">Cor do LED (Lightbar)</label>
+                <input id="inp-lightbar-color" type="color" value="#00e5ff" class="w-12 h-8 rounded cursor-pointer bg-transparent border-0" />
+              </div>
+
+              <div class="grid grid-cols-4 gap-2">
+                <button type="button" data-led-preset="#00e5ff" class="py-2 rounded-xl text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">Ciano</button>
+                <button type="button" data-led-preset="#00439c" class="py-2 rounded-xl text-xs font-bold bg-blue-600/25 text-blue-300 border border-blue-500/40">PS Azul</button>
+                <button type="button" data-led-preset="#f59e0b" class="py-2 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40">Hall</button>
+                <button type="button" data-led-preset="#ff3300" class="py-2 rounded-xl text-xs font-bold bg-orange-600/20 text-orange-300 border border-orange-500/40">TMR</button>
+              </div>
+
+              <div id="box-ps5-leds" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-800">
+                <div>
+                  <label for="sel-player-leds" class="block text-xs font-bold text-slate-400 mb-1.5">LEDs de Jogador (PS5)</label>
+                  <select id="sel-player-leds" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2.5 text-xs sm:text-sm text-white">
+                    <option value="1">Jogador 1 (Centro)</option>
+                    <option value="2">Jogador 2 (Duplo)</option>
+                    <option value="3">Jogador 3 (Triplo)</option>
+                    <option value="4">Jogador 4 (Quádruplo)</option>
+                    <option value="5">Todos os 5 LEDs</option>
+                    <option value="0">Desligados</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="sel-mute-led" class="block text-xs font-bold text-slate-400 mb-1.5">LED Botão Mute (PS5)</label>
+                  <select id="sel-mute-led" class="w-full rounded-xl bg-slate-900 border border-slate-700 px-3 py-2.5 text-xs sm:text-sm text-white">
+                    <option value="0">Apagado</option>
+                    <option value="1">Aceso Fixo (Laranja)</option>
+                    <option value="2">Pulsando (Breathing)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- DADOS DE HARDWARE & SENSORES -->
+        <section id="section-hardware-telemetry" class="hidden w-full tech-card rounded-3xl p-6 sm:p-8 border border-cyan-500/25 space-y-6">
+          <div class="border-b border-slate-800/90 pb-5">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-cyan-400 block mb-1">
+              Diagnóstico Interno de Hardware
+            </span>
+            <h3 id="title-hardware-telemetry" class="font-display-tech text-2xl sm:text-3xl font-extrabold text-white uppercase">
+              Hardware, Bateria &amp; Sensores
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">
+              Inspeção técnica em tempo real dos componentes disponíveis no controle conectado.
+            </p>
+          </div>
+
+          <div id="grid-hardware-telemetry" class="grid grid-cols-1 gap-6 items-stretch">
+            <div class="bg-slate-950/85 rounded-2xl p-5 border border-slate-800/90 space-y-3 text-xs sm:text-sm flex flex-col justify-between">
+              <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                <span class="text-slate-400">Protocolo / Conexão:</span>
+                <span id="info-connection" class="font-bold text-cyan-300">Aguardando...</span>
+              </div>
+              <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                <span class="text-slate-400">Taxa de Resposta (Polling):</span>
+                <span id="info-polling" class="font-mono font-bold text-emerald-400">—</span>
+              </div>
+              <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                <span class="text-slate-400">ID de Hardware (VID:PID):</span>
+                <span id="info-vidpid" class="font-mono font-bold text-slate-200">—</span>
+              </div>
+              <div id="row-board-rev" class="hidden flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                <span class="text-slate-400">Revisão / Modelo Placa:</span>
+                <span id="info-board" class="font-mono font-bold text-amber-300">—</span>
+              </div>
+              <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                <span class="text-slate-400">Status da Bateria:</span>
+                <span id="info-battery" class="font-bold text-emerald-300">—</span>
+              </div>
+              <div id="row-touchpad-coord" class="hidden flex items-center justify-between">
+                <span class="text-slate-400">Coordenadas Touchpad:</span>
+                <span id="info-touch1" class="font-mono text-slate-300">Sem toque</span>
+              </div>
+            </div>
+
+            <div id="box-touchpad-tracker" class="hidden bg-slate-950/85 rounded-2xl p-5 border border-slate-800/90 flex flex-col justify-between space-y-3">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold uppercase text-cyan-300">Touchpad Tracker (1920 × 1080)</span>
+                <span id="info-touch2" class="font-mono text-amber-300">Multitoque (2 Dedos)</span>
+              </div>
+              <canvas id="canvas-touchpad" width="380" height="150" class="w-full h-[140px] rounded-xl bg-slate-950 border border-slate-800 cursor-crosshair"></canvas>
+              <p id="touchpad-mode-hint" class="text-[11px] text-slate-400 leading-relaxed">
+                No DualSense/DS4, conecte via <strong class="text-cyan-300">WebHID</strong> para rastrear até 2 dedos em tempo real (ou arraste aqui para testar).
+              </p>
+            </div>
+
+            <div id="box-imu-sensors" class="hidden bg-slate-950/85 rounded-2xl p-5 border border-slate-800/90 flex flex-col justify-between space-y-3">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold uppercase text-slate-300">Sensores IMU (Giroscópio 3 Eixos)</span>
+                <span id="info-gyro" class="font-mono text-cyan-300">X:0 Y:0 Z:0</span>
+              </div>
+              <canvas id="canvas-imu" width="380" height="140" class="w-full h-[130px] rounded-xl bg-slate-950 border border-slate-900"></canvas>
+              <div class="flex items-center justify-between text-xs text-slate-400">
+                <span>Acelerômetro:</span>
+                <span id="info-accel" class="font-mono text-slate-300">X:0 Y:0 Z:0</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+
+      <!-- ====================================================================
+           BANNER DIRETO DE MANUTENÇÃO (REDIRECIONAMENTO WHATSAPP / INSTAGRAM / ABA MANUTENÇÃO)
+           ==================================================================== -->
+      <section class="rounded-3xl bg-gradient-to-r from-[#0b1d3a] via-[#071326] to-[#050d1a] border-2 border-cyan-400/40 p-6 sm:p-8 shadow-[0_0_50px_rgba(0,229,255,0.15)]">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="space-y-2 max-w-2xl">
+            <span class="inline-block text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">
+              Manutenção ArrowTech • 3 Meses de Garantia
+            </span>
+            <h2 class="font-display-tech text-2xl sm:text-3xl font-extrabold text-white uppercase">
+              Detectou <span class="text-gradient-sensor">Stick Drift ou Botão Falhando?</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Trocamos seus analógicos por sensores magnéticos <strong class="text-amber-400">Hall Effect</strong> ou <strong class="text-orange-400">TMR (Zero Drift)</strong> com <strong>Limpeza Completa + Grips de Brinde</strong>. Envie o resultado do seu teste direto no WhatsApp ou confira nossa aba de manutenção!
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 shrink-0 w-full lg:w-auto">
+            <a href="manutencao.html"
+               class="btn-outline-arrow px-5 py-3.5 rounded-2xl text-xs sm:text-sm uppercase tracking-wider text-center inline-flex items-center justify-center gap-2">
+              <span>🛠️</span>
+              <span>Ver Manutenção &amp; Preços</span>
+            </a>
+
+            <button id="btn-send-diagnosis"
+                    type="button"
+                    class="btn-primary-arrow px-6 py-3.5 rounded-2xl text-xs sm:text-sm uppercase tracking-wider text-center inline-flex items-center justify-center gap-2 cursor-pointer">
+              <span>📲 Enviar Diagnóstico no WhatsApp</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Rodapé Enxuto -->
+  <footer class="bg-slate-950 border-t border-cyan-500/20 py-8 text-slate-400 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2.5">
+        <img src="assets/img/logo-icon.png" alt="Logo ArrowTech" class="w-7 h-7 object-contain" />
+        <span class="font-bold text-white">ARROWTECH</span>
+        <span>• Testador de Controles &amp; Assistência Técnica</span>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="index.html" class="text-cyan-400 font-semibold">Testador de Controles</a>
+        <span>•</span>
+        <a href="manutencao.html" class="hover:text-cyan-400 transition-colors">Manutenção &amp; Upgrades</a>
+        <span>•</span>
+        <a href="https://wa.me/5511915364181?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20ArrowTech." target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition-colors">WhatsApp</a>
+        <span>•</span>
+        <a href="https://instagram.com/_arrowtech" target="_blank" rel="noopener noreferrer" class="hover:text-pink-400 transition-colors">Instagram</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Botão Flutuante do WhatsApp -->
+  <a href="https://wa.me/5511915364181?text=Ol%C3%A1%21%20Vim%20pelo%20Testador%20de%20Controles%20da%20ArrowTech%20e%20quero%20fazer%20um%20or%C3%A7amento."
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="Falar no WhatsApp com a ArrowTech"
+     class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-[0_10px_30px_rgba(16,185,129,0.5)] hover:scale-110 transition-transform pulse-ring">
+    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24">
+      <path d="M20.52 3.48A11.82 11.82 0 0012.04 0C5.5 0 .18 5.32.18 11.86c0 2.09.55 4.13 1.59 5.93L0 24l6.38-1.67a11.82 11.82 0 005.66 1.44h.01c6.54 0 11.86-5.32 11.86-11.86 0-3.17-1.23-6.15-3.39-8.43zM12.05 21.77h-.01a9.87 9.87 0 01-5.03-1.38l-.36-.21-3.79.99 1.01-3.69-.24-.38a9.85 9.85 0 01-1.51-5.25c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.82 9.82 0 012.89 6.99c0 5.45-4.43 9.9-9.84 9.9zm5.42-7.41c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.22 3.08.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.69.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35z"/>
+    </svg>
+  </a>
+
+  <!-- Scripts do Testador -->
+  <script src="assets/js/data.js?v=12"></script>
+  <script src="assets/js/tester.js?v=12"></script>
+</body>
+</html>

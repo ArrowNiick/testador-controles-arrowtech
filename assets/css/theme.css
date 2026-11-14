@@ -1,0 +1,258 @@
+/* ==========================================================================
+   ARROWTECH - DESIGN SYSTEM & IDENTIDADE VISUAL (THEME VARIABLES)
+   Baseado na pasta "identidade visual" (Dark Cyber Circuit, Azul Elétrico & Ciano)
+   ========================================================================== */
+
+:root {
+  /* Cores de Fundo (Dark Circuit Theme) */
+  --bg-deep: #040911;
+  --bg-primary: #07101e;
+  --bg-secondary: #0b192e;
+  --bg-card: rgba(11, 25, 46, 0.78);
+  --bg-card-hover: rgba(15, 34, 62, 0.92);
+
+  /* Cores da Identidade Visual ArrowTech */
+  --brand-blue: #0088ff;
+  --brand-blue-dark: #0055b3;
+  --brand-cyan: #00e5ff;
+  --brand-teal: #00d4b2;
+  --brand-emerald: #10b981;
+
+  /* Cores de Destaque dos Sensores (Guia de Diferenças) */
+  --sensor-original: #14b8a6; /* Verde-azulado potenciômetro */
+  --sensor-hall: #f59e0b;     /* Âmbar/Laranja Hall Effect */
+  --sensor-tmr: #ff5500;      /* Laranja Vibrante/Avermelhado TMR */
+
+  /* Texto e Leiturabilidade */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Bordas e Glows */
+  --border-subtle: rgba(0, 229, 255, 0.16);
+  --border-glow: rgba(0, 229, 255, 0.48);
+  --shadow-cyan: 0 0 28px rgba(0, 229, 255, 0.18);
+  --shadow-blue: 0 10px 35px -5px rgba(0, 136, 255, 0.35);
+
+  /* Tipografia */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ==========================================================================
+   BASE & SCROLLBAR
+   ========================================================================== */
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+body {
+  background-color: var(--bg-deep);
+  overflow-x: hidden;
+  selection-background-color: var(--brand-cyan);
+  selection-color: var(--bg-deep);
+}
+
+::selection {
+  background: var(--brand-cyan);
+  color: var(--bg-deep);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: #132c4e;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 229, 255, 0.25);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-blue);
+}
+
+/* ==========================================================================
+   BACKGROUNDS & PADRÃO DE CIRCUITO (IDENTIDADE VISUAL)
+   ========================================================================== */
+.bg-circuit-pattern {
+  background-color: var(--bg-deep);
+  background-image:
+    radial-gradient(circle at 18% 15%, rgba(0, 136, 255, 0.16) 0%, transparent 42%),
+    radial-gradient(circle at 85% 25%, rgba(0, 212, 178, 0.13) 0%, transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(0, 136, 255, 0.10) 0%, transparent 50%),
+    linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 44px 44px, 44px 44px;
+}
+
+/* Linhas decorativas de trilha PCB */
+.pcb-trace-line {
+  position: relative;
+}
+.pcb-trace-line::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 136, 255, 0.3) 20%,
+    rgba(0, 229, 255, 0.85) 50%,
+    rgba(0, 136, 255, 0.3) 80%,
+    transparent 100%
+  );
+}
+
+/* ==========================================================================
+   TIPOGRAFIA DE DESTAQUE (ESTILO POSTERS ARROWTECH)
+   ========================================================================== */
+.font-display-tech {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.text-gradient-arrow {
+  background: linear-gradient(135deg, #00f2fe 0%, #00d4b2 45%, #0088ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
+}
+
+.text-gradient-sensor {
+  background: linear-gradient(135deg, #fbbf24 0%, #ff5500 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Badge de destaque reta, alinhada e limpa */
+.arrow-skew-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #00a896 0%, #00d4b2 50%, #0088ff 100%);
+  color: #030914;
+  font-weight: 800;
+  border-radius: 9999px;
+  padding: 0.35rem 1rem;
+  box-shadow: 0 0 20px rgba(0, 212, 178, 0.3);
+}
+.arrow-skew-badge > span {
+  display: inline-block;
+}
+
+/* ==========================================================================
+   CARDS & EFEITOS INTERATIVOS
+   ========================================================================== */
+.tech-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tech-card:hover {
+  transform: translateY(-6px);
+  background: var(--bg-card-hover);
+  border-color: var(--brand-cyan);
+  box-shadow: var(--shadow-cyan);
+}
+
+/* Card com destaque laranja de sensor (opcional em hover de elementos específicos) */
+.tech-card-sensor:hover {
+  border-color: var(--sensor-hall);
+  box-shadow: 0 0 28px rgba(245, 158, 11, 0.22);
+}
+
+/* Estrelas de junção na Tabela de Preços (igual à arte oficial) */
+.price-grid-node {
+  position: relative;
+}
+.price-grid-node::before {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: #00e5ff;
+  border-radius: 9999px;
+  top: -3.5px;
+  left: -3.5px;
+  box-shadow: 0 0 10px 2px #00e5ff, 0 0 20px 4px #0088ff;
+}
+
+/* Botões Principais */
+.btn-primary-arrow {
+  background: linear-gradient(135deg, #0088ff 0%, #00d4b2 100%);
+  color: #030914;
+  font-weight: 800;
+  transition: all 0.25s ease;
+  box-shadow: 0 8px 25px -4px rgba(0, 212, 178, 0.45);
+}
+.btn-primary-arrow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -4px rgba(0, 229, 255, 0.65);
+  filter: brightness(1.08);
+}
+
+.btn-outline-arrow {
+  border: 1.5px solid rgba(0, 229, 255, 0.5);
+  background: rgba(0, 136, 255, 0.07);
+  color: var(--text-primary);
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+.btn-outline-arrow:hover {
+  border-color: var(--brand-cyan);
+  background: rgba(0, 229, 255, 0.16);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Animação suave de flutuação para o controle no Hero */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: floatSlow 5s ease-in-out infinite;
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+
+.pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid var(--brand-cyan);
+  animation: pulseRing 2.4s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
